@@ -1,30 +1,40 @@
 // =====================================
 // BATTLE GAME SERVER
-// Telegram Mini App
+// TELEGRAM + API
 // =====================================
 
 
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import path from "path";
+const express = require("express");
 
-import TelegramBot from "node-telegram-bot-api";
+const cors = require("cors");
 
-import {
-    initDatabase,
-    getPlayer,
-    createPlayer,
-    addEgg,
-    getEggs,
-    updateBalance
-} from "./database.js";
+const path = require("path");
 
-import { fileURLToPath } from "url";
+const TelegramBot = require("node-telegram-bot-api");
 
 
 
-dotenv.config();
+const {
+
+
+initDatabase,
+
+getPlayer,
+
+createPlayer,
+
+getEggs,
+
+addBalance,
+
+buyEgg
+
+
+} = require("./database");
+
+
+
+
 
 
 
@@ -33,20 +43,16 @@ const app = express();
 
 app.use(cors());
 
+
 app.use(express.json());
 
 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 
-
-
-
-// =============================
+// =====================================
 // STATIC
-// =============================
+// =====================================
 
 
 app.use(
@@ -65,9 +71,11 @@ path.join(__dirname,"public")
 
 
 
-// =============================
+
+
+// =====================================
 // DATABASE
-// =============================
+// =====================================
 
 
 initDatabase();
@@ -79,30 +87,42 @@ initDatabase();
 
 
 
-// =============================
+
+// =====================================
 // TELEGRAM BOT
-// =============================
+// =====================================
 
 
-const TOKEN = process.env.BOT_TOKEN;
+
+const BOT_TOKEN = process.env.BOT_TOKEN;
+
 
 
 let bot = null;
 
 
 
-if(TOKEN){
+
+
+if(BOT_TOKEN){
+
 
 
 bot = new TelegramBot(
 
-TOKEN,
+BOT_TOKEN,
 
 {
+
 polling:true
+
 }
 
 );
+
+
+
+
 
 
 
@@ -114,19 +134,94 @@ bot.onText(
 
 
 
-const id = String(
-msg.from.id
+
+
+let user = msg.from;
+
+
+
+let ref = "";
+
+
+
+if(match[1]){
+
+ref = match[1].trim();
+
+}
+
+
+
+
+
+
+
+
+createPlayer(
+
+{
+
+id:String(user.id),
+
+username:user.username,
+
+first_name:user.first_name,
+
+avatar:""
+
+}
+
+
 );
 
 
 
-const ref = match[1]
 
-?
-match[1].trim()
-:
-null;
 
+
+
+
+bot.sendMessage(
+
+msg.chat.id,
+
+
+"⚔️ Battle Game запущен\n\nВаш первый дракон SINNI уже получен"
+
+);
+
+
+
+});
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// GET PLAYER
+// =====================================
+
+
+app.post(
+
+"/player",
+
+(req,res)=>{
+
+
+
+let id = String(req.body.id);
 
 
 
@@ -143,35 +238,75 @@ id,
 if(!player){
 
 
-
 createPlayer(
 
 {
 
 id:id,
 
-username:
-msg.from.username || "",
+username:req.body.username,
 
-first_name:
-msg.from.first_name || "",
+first_name:req.body.first_name,
 
-ref:ref
+avatar:req.body.avatar
+
 
 },
+
 
 ()=>{
 
 
-// первое яйцо
-
-addEgg(
+getPlayer(
 
 id,
 
-"SINNI"
+(p)=>{
+
+
+res.json({
+
+success:true,
+
+player:p
+
+});
+
+
+}
+
 
 );
+
+
+
+}
+
+
+);
+
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+res.json({
+
+success:true,
+
+player
+
+});
+
+
 
 
 
@@ -183,58 +318,163 @@ id,
 
 }
 
-
-
-
-bot.sendMessage(
-
-msg.chat.id,
-
-"⚔️ Battle Game запущен"
-
 );
 
 
 
-}
-
-);
-
-
-
-}
-
-);
-
-
-
-}
 
 
 
 
 
 
-
-
-
-// =============================
-// CREATE / GET PLAYER
-// =============================
+// =====================================
+// EGGS
+// =====================================
 
 
 app.post(
 
-"/player",
+"/eggs",
 
 (req,res)=>{
 
 
-const data=req.body;
+
+getEggs(
+
+String(req.body.id),
+
+(eggs)=>{
 
 
 
-const id=String(data.id);
+res.json({
+
+success:true,
+
+eggs
+
+});
+
+
+}
+
+
+);
+
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+// =====================================
+// BUY EGG
+// =====================================
+
+
+const EGGS = {
+
+
+SINNI:{
+
+price:10000,
+
+income:0.001
+
+},
+
+
+BORLI:{
+
+price:50000,
+
+income:0.010
+
+},
+
+
+BONI:{
+
+price:100000,
+
+income:0.075
+
+},
+
+
+JOUNI:{
+
+price:700000,
+
+income:0.100
+
+},
+
+
+"SIXI LEGA":{
+
+price:1300000,
+
+income:5
+
+}
+
+
+};
+
+
+
+
+
+
+
+
+
+app.post(
+
+"/buy",
+
+(req,res)=>{
+
+
+
+let id = String(req.body.id);
+
+
+
+let type=req.body.type;
+
+
+
+
+
+let egg=EGGS[type];
+
+
+
+
+
+if(!egg)
+
+return res.json({
+
+success:false,
+
+message:"Яйцо не найдено"
+
+});
+
+
 
 
 
@@ -249,23 +489,30 @@ id,
 
 
 
-
-
-if(player){
-
-
+if(!player)
 
 return res.json({
 
-success:true,
-
-player
+success:false
 
 });
 
 
 
-}
+
+
+
+
+
+if(player.balance < egg.price)
+
+return res.json({
+
+success:false,
+
+message:"Недостаточно средств"
+
+});
 
 
 
@@ -273,31 +520,24 @@ player
 
 
 
-createPlayer(
 
-{
+
+player.balance -= egg.price;
+
+
+
+
+
+
+buyEgg(
 
 id,
 
-username:data.username,
+type,
 
-first_name:data.first_name,
+egg.price,
 
-avatar:data.avatar,
-
-ref:data.ref
-
-},
-
-()=>{
-
-
-
-addEgg(
-
-id,
-
-"SINNI"
+egg.income
 
 );
 
@@ -305,37 +545,23 @@ id,
 
 
 
-getPlayer(
 
-id,
-
-(newPlayer)=>{
 
 
 res.json({
 
 success:true,
 
-player:newPlayer
+balance:player.balance
 
 });
 
 
-}
-
-);
-
-
 
 
 
 }
 
-);
-
-
-
-}
 
 
 );
@@ -354,94 +580,47 @@ player:newPlayer
 
 
 
-// =============================
-// GET EGGS
-// =============================
-
-
-app.post(
-
-"/eggs",
-
-(req,res)=>{
-
-
-const id=String(
-req.body.id
-);
+// =====================================
+// INCOME SYSTEM
+// =====================================
 
 
 
-getEggs(
-
-id,
-
-(eggs)=>{
-
-
-res.json({
-
-success:true,
-
-eggs
-
-});
-
-
-}
-
-);
+setInterval(()=>{
 
 
 
-}
+db.all(
+
+`
+
+SELECT owner,SUM(income) as inc
+
+FROM eggs
+
+GROUP BY owner
+
+`,
+
+(rows)=>{
+
+
+
+
+
+rows.forEach(row=>{
+
+
+
+addBalance(
+
+row.owner,
+
+row.inc
 
 );
 
 
-
-
-
-
-
-
-
-// =============================
-// CLICK / INCOME UPDATE
-// =============================
-
-
-app.post(
-
-"/balance",
-
-(req,res)=>{
-
-
-const id=String(
-req.body.id
-);
-
-
-
-const balance=
-Number(req.body.balance);
-
-
-
-updateBalance(
-
-id,
-
-balance
-
-);
-
-
-
-res.json({
-
-success:true
 
 });
 
@@ -449,23 +628,30 @@ success:true
 
 }
 
+
 );
 
 
 
+},60000);
 
 
 
 
 
 
-// =============================
+
+
+
+
+
+// =====================================
 // SERVER
-// =============================
+// =====================================
 
 
-const PORT =
-process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 3000;
 
 
 
@@ -478,7 +664,7 @@ PORT,
 
 console.log(
 
-"Battle Game server started",
+"Battle Game started",
 
 PORT
 
