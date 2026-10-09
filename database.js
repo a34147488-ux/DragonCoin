@@ -1,24 +1,42 @@
-import sqlite3 from "sqlite3";
-import path from "path";
-import { fileURLToPath } from "url";
+// =====================================
+// BATTLE GAME DATABASE
+// DRAGON EGGS SYSTEM
+// =====================================
 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const sqlite3 = require("sqlite3").verbose();
+
+const path = require("path");
+
 
 
 const db = new sqlite3.Database(
-    path.join(__dirname,"battle.db")
+
+path.join(
+__dirname,
+"battle.db"
+)
+
 );
 
 
 
-export function initDatabase(){
+
+
+
+
+// =====================================
+// CREATE TABLES
+// =====================================
+
+
+function initDatabase(){
+
 
 
 db.run(`
 
-CREATE TABLE IF NOT EXISTS players(
+CREATE TABLE IF NOT EXISTS players (
 
 id TEXT PRIMARY KEY,
 
@@ -28,17 +46,26 @@ first_name TEXT,
 
 avatar TEXT,
 
-nickname TEXT,
 
-nickname_color TEXT DEFAULT "#ffffff",
+nickname TEXT DEFAULT 'Dragon',
+
+nickname_color TEXT DEFAULT '#ffffff',
+
 
 balance REAL DEFAULT 0,
 
+
 income REAL DEFAULT 0,
 
-referrer TEXT,
 
-free_egg_time INTEGER DEFAULT 0,
+api_key TEXT,
+
+
+friends INTEGER DEFAULT 0,
+
+
+last_free_egg INTEGER DEFAULT 0,
+
 
 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 
@@ -50,23 +77,40 @@ created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 
 
 
+
+
+
 db.run(`
 
-CREATE TABLE IF NOT EXISTS eggs(
+CREATE TABLE IF NOT EXISTS eggs (
+
 
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-player_id TEXT,
+
+owner TEXT,
+
 
 type TEXT,
 
+
 level INTEGER DEFAULT 1,
 
+
+price INTEGER,
+
+
+income REAL,
+
+
 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
 
 )
 
 `);
+
+
 
 
 
@@ -74,27 +118,40 @@ created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 
 db.run(`
 
-CREATE TABLE IF NOT EXISTS history(
+CREATE TABLE IF NOT EXISTS transfers (
+
 
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-player TEXT,
 
-action TEXT,
+from_id TEXT,
 
-created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+to_id TEXT,
+
+
+amount REAL,
+
+
+date DATETIME DEFAULT CURRENT_TIMESTAMP
+
 
 )
 
 `);
+
+
 
 
 
 
 
 console.log(
+
 "Battle database ready"
+
 );
+
 
 
 }
@@ -106,15 +163,25 @@ console.log(
 
 
 
-export function getPlayer(id,callback){
+
+// =====================================
+// GET PLAYER
+// =====================================
+
+
+function getPlayer(id,callback){
 
 
 db.get(
 
 `
+
 SELECT *
+
 FROM players
+
 WHERE id=?
+
 `,
 
 [id],
@@ -124,6 +191,7 @@ callback
 );
 
 
+
 }
 
 
@@ -133,7 +201,14 @@ callback
 
 
 
-export function createPlayer(data,callback){
+
+// =====================================
+// CREATE PLAYER
+// =====================================
+
+
+function createPlayer(data,callback){
+
 
 
 db.run(
@@ -143,15 +218,78 @@ db.run(
 INSERT OR IGNORE INTO players
 
 (
+
 id,
+
 username,
+
 first_name,
+
 avatar,
+
 nickname,
-referrer
+
+api_key
+
 )
 
-VALUES(?,?,?,?,?,?)
+VALUES
+
+(?,?,?,?,?,?)
+
+`,
+
+[
+
+
+data.id,
+
+
+data.username || "",
+
+
+data.first_name || "",
+
+
+data.avatar || "",
+
+
+"Dragon",
+
+
+"API-"+data.id+"-"+Date.now()
+
+
+],
+
+
+()=>{
+
+
+// выдаём стартовое яйцо SINNI
+
+
+db.run(
+
+`
+
+INSERT INTO eggs
+
+(
+
+owner,
+
+type,
+
+price,
+
+income
+
+)
+
+VALUES
+
+(?,?,?,?)
 
 `,
 
@@ -159,15 +297,280 @@ VALUES(?,?,?,?,?,?)
 
 data.id,
 
-data.username || "",
+"SINNI",
 
-data.first_name || "",
+10000,
 
-data.avatar || "",
+0.001
 
-data.first_name || "Dragon",
+]
 
-data.ref || null
+
+);
+
+
+
+if(callback)
+
+callback();
+
+
+
+}
+
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// GET PLAYER EGGS
+// =====================================
+
+
+function getEggs(id,callback){
+
+
+
+db.all(
+
+`
+
+SELECT *
+
+FROM eggs
+
+WHERE owner=?
+
+`,
+
+[id],
+
+callback
+
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// ADD BALANCE
+// =====================================
+
+
+function addBalance(id,amount){
+
+
+
+db.run(
+
+`
+
+UPDATE players
+
+SET balance = balance + ?
+
+WHERE id=?
+
+`,
+
+[
+
+amount,
+
+id
+
+]
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// UPDATE PLAYER
+// =====================================
+
+
+function updatePlayer(id,data){
+
+
+
+db.run(
+
+`
+
+UPDATE players SET
+
+balance=?,
+
+income=?,
+
+nickname=?,
+
+nickname_color=?
+
+WHERE id=?
+
+`,
+
+[
+
+
+data.balance,
+
+
+data.income,
+
+
+data.nickname,
+
+
+data.nickname_color,
+
+
+id
+
+
+]
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// BUY EGG
+// =====================================
+
+
+function buyEgg(id,type,price,income,callback){
+
+
+
+db.run(
+
+`
+
+INSERT INTO eggs
+
+(
+
+owner,
+
+type,
+
+price,
+
+income
+
+)
+
+VALUES
+
+(?,?,?,?)
+
+`,
+
+[
+
+id,
+
+type,
+
+price,
+
+income
+
+],
+
+
+callback
+
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// DELETE EGG
+// =====================================
+
+
+function deleteEgg(id,eggId,callback){
+
+
+
+db.run(
+
+`
+
+DELETE FROM eggs
+
+WHERE id=?
+
+AND owner=?
+
+`,
+
+[
+
+eggId,
+
+id
 
 ],
 
@@ -178,40 +581,6 @@ callback
 );
 
 
-}
-
-
-
-
-
-
-
-export function addEgg(player,type){
-
-
-db.run(
-
-`
-
-INSERT INTO eggs
-
-(
-player_id,
-type
-)
-
-VALUES(?,?)
-
-`,
-
-[
-player,
-type
-]
-
-
-);
-
 
 }
 
@@ -221,62 +590,36 @@ type
 
 
 
-export function getEggs(player,callback){
 
 
-db.all(
-
-`
-
-SELECT *
-FROM eggs
-WHERE player_id=?
-
-`,
-
-[player],
-
-callback
+module.exports = {
 
 
-);
+db,
 
 
-}
+initDatabase,
 
 
+getPlayer,
 
 
+createPlayer,
 
 
-export function updateBalance(id,balance){
+getEggs,
 
 
-db.run(
-
-`
-
-UPDATE players
-
-SET balance=?
-
-WHERE id=?
-
-`,
-
-[
-balance,
-id
-]
+addBalance,
 
 
-);
+updatePlayer,
 
 
-}
+buyEgg,
 
 
+deleteEgg
 
 
-
-export default db;
+};
