@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>Battle Game</title>
+
+
+<link rel="stylesheet" href="style.css">
+
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+</head>
+
+
+
+<body>
+
+
+<div class="lightning"></div>
+
+
+<div class="app">
+
+
+
+<!-- ======================
+ГЛАВНАЯ
+====================== -->
+
+
+<section class="page active" id="home">
+
+
+
+<div class="balance-panel">
+
+
+<div class="dragon-logo">
+
+S
+
+</div>
+
+
+<div class="balance">
+
+
+<span id="balance">
+
+0
+
+</span>
+
+</div>
+
+
+<div class="income">
+
+Доход:
+
+<span id="income">
+
+0
+
+</span>
+
+/ мин
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="free-egg">
+
+
+<div class="egg-mini">
+
+S
+
+</div>
+
+
+<h3>
+
+Бесплатное яйцо
+
+</h3>
+
+
+<p id="freeTimer">
+
+Доступно
+
+</p>
+
+
+
+<button id="freeEgg">
+
+ПОЛУЧИТЬ
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+ЯЙЦА
+====================== -->
+
+
+<section class="page" id="eggs">
+
+
+
+<h1>
+
+ЯЙЦА
+
+</h1>
+
+
+
+
+
+<div id="eggList">
+
+
+
+</div>
+
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+РЕЙТИНГ
+====================== -->
+
+
+<section class="page" id="rating">
+
+
+
+<h1>
+
+РЕЙТИНГ
+
+</h1>
+
+
+<div class="glass">
+
+
+Топ игроков
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+ПРИГЛАСИТЬ
+====================== -->
+
+
+<section class="page" id="invite">
+
+
+
+<h1>
+
+ПРИГЛАСИТЬ
+
+</h1>
+
+
+
+<div class="glass">
+
+
+Твои работники:
+
+<span id="friends">
+
+0
+
+</span>
+
+
+
+</div>
+
+
+
+<button class="big-button">
+
+СКОПИРОВАТЬ ССЫЛКУ
+
+</button>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+API
+====================== -->
+
+
+<section class="page" id="api">
+
+
+
+<h1>
+
+API
+
+</h1>
+
+
+
+<div class="glass">
+
+
+Твой ключ:
+
+<p id="apiKey">
+
+Создание...
+
+</p>
+
+
+
+</div>
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+ЕЩЁ
+====================== -->
+
+
+<section class="page" id="more">
+
+
+
+<h1>
+
+ЕЩЁ
+
+</h1>
+
+
+
+
+
+
+<div class="settings">
+
+
+
+<button>
+
+✦ Сменить ник
+
+</button>
+
+
+
+<button>
+
+✦ Цвет ника
+
+</button>
+
+
+
+<button>
+
+✦ История
+
+</button>
+
+
+
+<button>
+
+✦ Настройки
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+НИЖНЕЕ МЕНЮ
+====================== -->
+
+
+
+<nav class="menu">
+
+
+
+<button data-page="eggs">
+
+◈
+
+</button>
+
+
+
+<button data-page="rating">
+
+◇
+
+</button>
+
+
+
+<button data-page="invite">
+
+◉
+
+</button>
+
+
+
+<button data-page="api">
+
+△
+
+</button>
+
+
+
+<button data-page="more">
+
+✦
+
+</button>
+
+
+
+<button data-page="home" class="active">
+
+◆
+
+</button>
+
+
+
+</nav>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script src="config.js"></script>
+
+<script src="storage.js"></script>
+
+<script src="telegram.js"></script>
+
+<script src="app.js"></script>
+
+
+
+</body>
+
+
+</html>
