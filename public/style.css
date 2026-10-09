@@ -1,0 +1,787 @@
+/* =====================================
+BATTLE GAME STYLE
+DARK DRAGON SYSTEM
+===================================== */
+
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+
+html,
+body{
+
+    margin:0;
+    padding:0;
+
+    width:100%;
+    min-height:100%;
+
+    overflow:hidden;
+
+    font-family:Arial,sans-serif;
+
+    color:white;
+
+    background:
+
+    linear-gradient(
+        180deg,
+        #050000,
+        #300000,
+        #050000
+    );
+
+}
+
+
+
+
+body:before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+
+    radial-gradient(
+        circle,
+        rgba(255,0,0,.35),
+        transparent 60%
+    );
+
+
+    animation:
+
+    fire 8s infinite alternate;
+
+
+}
+
+
+
+@keyframes fire{
+
+    from{
+
+        opacity:.3;
+
+    }
+
+
+    to{
+
+        opacity:.8;
+
+    }
+
+}
+
+
+
+
+
+
+/* =========================
+LIGHTNING
+========================= */
+
+
+.lightning{
+
+
+    position:fixed;
+
+    inset:0;
+
+
+    pointer-events:none;
+
+
+    background:
+
+    linear-gradient(
+    120deg,
+    transparent 45%,
+    rgba(255,255,255,.25),
+    transparent 55%
+    );
+
+
+    animation:
+
+    lightning 5s infinite;
+
+
+}
+
+
+
+@keyframes lightning{
+
+
+    0%,90%{
+
+        opacity:0;
+
+    }
+
+
+    92%{
+
+        opacity:1;
+
+    }
+
+
+    95%{
+
+        opacity:0;
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+.app{
+
+    height:100vh;
+
+    position:relative;
+
+    z-index:5;
+
+}
+
+
+
+
+
+
+
+.page{
+
+
+    display:none;
+
+    height:calc(100vh - 100px);
+
+    overflow:hidden;
+
+    padding-top:30px;
+
+
+}
+
+
+
+.page.active{
+
+
+    display:block;
+
+    animation:
+
+    show .3s;
+
+
+}
+
+
+
+@keyframes show{
+
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+BALANCE
+========================= */
+
+
+.balance-panel{
+
+
+    width:90%;
+
+    margin:auto;
+
+    padding:35px 20px;
+
+
+    border-radius:35px;
+
+
+    background:
+
+    rgba(0,0,0,.55);
+
+
+    border:
+
+    2px solid #ffcc00;
+
+
+    box-shadow:
+
+    0 0 40px red,
+
+    inset 0 0 30px orange;
+
+
+    text-align:center;
+
+
+}
+
+
+
+.dragon-logo{
+
+
+    width:90px;
+
+    height:90px;
+
+
+    margin:auto;
+
+
+    border-radius:50%;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    font-size:55px;
+
+    font-weight:900;
+
+
+    background:
+
+    radial-gradient(
+    circle,
+    #fff000,
+    #ff9900,
+    #660000
+    );
+
+
+    color:white;
+
+
+    box-shadow:
+
+    0 0 50px gold;
+
+
+}
+
+
+
+.balance{
+
+
+    margin-top:25px;
+
+    font-size:45px;
+
+    font-weight:900;
+
+
+    color:#ffd700;
+
+
+    text-shadow:
+
+    0 0 20px orange;
+
+
+}
+
+
+
+.income{
+
+    margin-top:15px;
+
+    font-size:20px;
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+FREE EGG
+========================= */
+
+
+.free-egg{
+
+
+    width:90%;
+
+    margin:35px auto;
+
+
+    padding:25px;
+
+
+    border-radius:35px;
+
+
+    background:
+
+    rgba(255,255,255,.08);
+
+
+    border:
+
+    1px solid gold;
+
+
+    text-align:center;
+
+
+}
+
+
+
+.egg-mini{
+
+
+    width:80px;
+
+    height:100px;
+
+
+    margin:auto;
+
+
+    border-radius:
+
+    50% 50% 45% 45%;
+
+
+    background:
+
+    radial-gradient(
+    circle at 30% 30%,
+    white,
+    yellow,
+    orange
+    );
+
+
+    color:#600;
+
+
+    font-size:40px;
+
+    font-weight:900;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    box-shadow:
+
+    0 0 40px gold;
+
+
+}
+
+
+
+
+
+button{
+
+
+    border:none;
+
+
+    color:white;
+
+
+    font-weight:900;
+
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+EGGS
+========================= */
+
+
+#eggList{
+
+
+    width:90%;
+
+    margin:auto;
+
+
+}
+
+
+
+
+.egg-card{
+
+
+    padding:20px;
+
+    margin:15px 0;
+
+
+    border-radius:30px;
+
+
+    background:
+
+    rgba(0,0,0,.6);
+
+
+    border:
+
+    2px solid white;
+
+
+    box-shadow:
+
+    0 0 25px red;
+
+
+}
+
+
+
+.egg-card h2{
+
+    margin:0;
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+GLASS
+========================= */
+
+
+.glass{
+
+
+    width:90%;
+
+    margin:20px auto;
+
+    padding:25px;
+
+
+    border-radius:30px;
+
+
+    background:
+
+    rgba(255,255,255,.1);
+
+
+    border:
+
+    1px solid white;
+
+
+    backdrop-filter:
+
+    blur(20px);
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+BUTTONS
+========================= */
+
+
+.big-button{
+
+
+    width:90%;
+
+
+    height:60px;
+
+
+    margin:20px;
+
+
+    border-radius:30px;
+
+
+    background:
+
+    linear-gradient(
+    135deg,
+    red,
+    orange
+    );
+
+
+    box-shadow:
+
+    0 0 35px red;
+
+
+}
+
+
+
+
+.settings button{
+
+
+    display:block;
+
+
+    width:90%;
+
+
+    height:65px;
+
+
+    margin:15px auto;
+
+
+    border-radius:30px;
+
+
+    background:
+
+    rgba(255,255,255,.1);
+
+
+    border:
+
+    1px solid gold;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+BOTTOM MENU
+========================= */
+
+
+.menu{
+
+
+    position:fixed;
+
+
+    bottom:15px;
+
+
+    left:5%;
+
+
+    width:90%;
+
+
+    height:80px;
+
+
+    border-radius:45px;
+
+
+    display:flex;
+
+
+    justify-content:space-around;
+
+    align-items:center;
+
+
+    background:
+
+    rgba(0,0,0,.75);
+
+
+    border:
+
+    2px solid #550000;
+
+
+    box-shadow:
+
+    0 0 40px red;
+
+
+}
+
+
+
+
+
+
+.menu button{
+
+
+    width:55px;
+
+
+    height:55px;
+
+
+    border-radius:50%;
+
+
+    background:
+
+    #160000;
+
+
+    border:
+
+    1px solid red;
+
+
+    font-size:22px;
+
+
+}
+
+
+
+
+
+.menu button.active{
+
+
+    width:70px;
+
+    height:70px;
+
+
+    background:
+
+    radial-gradient(
+    circle,
+    yellow,
+    orange,
+    red
+    );
+
+
+    color:black;
+
+
+    box-shadow:
+
+    0 0 45px gold;
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+NO ZOOM
+========================= */
+
+
+input,
+button{
+
+    font-size:16px;
+
+    touch-action:manipulation;
+
+}
+
+
